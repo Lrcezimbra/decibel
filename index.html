@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title></title>
+	<script src="decibel-meter.js"></script>
+	<script>
+      function sleep (time) {
+        return new Promise((resolve) => setTimeout(resolve, time));
+      }
+
+      var level = null;
+      var lastDb = 0;
+      var meter = DecibelMeter.create('meter');
+      var audioSources;
+
+      meter.on('ready', function (meter, sources) {
+        meter.connect(sources[0]);
+        level = document.getElementById('db-level');
+        setTimeout(listen, 10000);
+      });
+
+      meter.on('sample', function (dB, percent, value) {
+        dB = Math.round(100 + dB)
+        if (lastDb != dB) {
+          level.innerHTML = dB + ' dB'; // display current dB level
+          lastDb = dB;
+          console.log(percent, value)
+          meter.stopListening();
+          setTimeout(listen, 500);
+        }
+      });
+
+      function listen(){
+        meter.listen()
+      }
+	</script>
+</head>
+<body style="background-color: black;">
+  <div id="meter">
+    <span></span>
+  </div>
+  <h1 id="db-level" style="color: white;"></h1>
+</body>
+</html>
